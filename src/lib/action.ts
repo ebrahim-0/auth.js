@@ -24,11 +24,41 @@ export const signUp = async (formData: FormData) => {
       await db.user.create({
         data: {
           email: validate.email.toLocaleLowerCase(),
-          password: validate.password,
+          password: await hashPassword(validate.password),
           name: "User",
         },
       });
     },
     successMessage: "Signed up successfully",
+  });
+};
+
+export const hashPassword = async (password: string) => {
+  const crypto = await import("crypto");
+
+  return new Promise<string>((resolve, reject) => {
+    crypto.pbkdf2(password, "salt", 12, 64, "sha512", (err, derivedKey) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(derivedKey.toString("hex"));
+    });
+  });
+};
+
+export const isMatch = async (password: string, hash: string) => {
+  const crypto = await import("crypto");
+
+  return new Promise<boolean>((resolve, reject) => {
+    crypto.pbkdf2(password, "salt", 12, 64, "sha512", (err, derivedKey) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(derivedKey.toString("hex") === hash);
+    });
   });
 };

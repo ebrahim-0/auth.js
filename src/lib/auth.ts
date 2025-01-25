@@ -8,6 +8,7 @@ import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { schema } from "./schema";
+import { isMatch } from "./action";
 
 class InvalidLoginError extends CredentialsSignin {
   message = "Invalid Credentials";
@@ -35,11 +36,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const existingUser = await db.user.findFirst({
           where: {
             email: validate.email,
-            password: validate.password,
           },
         });
 
-        if (!existingUser) {
+        const mathPass = await isMatch(
+          validate.password,
+          existingUser?.password || ""
+        );
+
+        if (!existingUser || !mathPass) {
           throw new InvalidLoginError();
         }
 
@@ -47,7 +52,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+
   callbacks: {
+    session: async ({ session, user }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _, ...userWithoutPassword } = user as {
+        password?: string;
+        id: string;
+        email: string;
+        emailVerified: Date | null;
+      };
+      session.user = userWithoutPassword;
+      return session;
+    },
     async jwt({ token, account }) {
       if (account?.provider === "credentials") {
         token.credentials = true;
