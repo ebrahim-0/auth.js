@@ -17,7 +17,7 @@ const hybridRoutes = ["/dashboard"];
 const authCookiesName =
   process.env.NODE_ENV === "development"
     ? "authjs.session-token"
-    : "__Secure-next-auth.session-token";
+    : "__Secure-authjs.session-token";
 
 const testPathnameRegex = (pages: string[], pathName: string): boolean => {
   const pathsWithParams = pages.map((p) => p.replace(/\[.*?\]/g, "[^/]+"));
