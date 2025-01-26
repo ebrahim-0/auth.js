@@ -1,28 +1,31 @@
 import { Link } from "@/i18n/routing";
 import LocaleSwitcher from "./LocaleSwitcher";
+import { getTranslations } from "next-intl/server";
 
-const NavBar = () => {
+const NavBar = async () => {
+  const t = await getTranslations({ namespace: "navbar" });
+
   return (
     <nav className="bg-gray-800 relative">
       <ul className="flex justify-center gap-4 py-5">
         <li>
           <Link href="/" className="text-white">
-            Home
+            {t("home")}
           </Link>
         </li>
         <li>
           <Link href="/dashboard" className="text-white">
-            Dashboard
+            {t("dashboard")}
           </Link>
         </li>
         <li>
           <Link href="/sign-in" className="text-white">
-            Sign In
+            {t("signin")}
           </Link>
         </li>
         <li>
           <Link href="/sign-up" className="text-white">
-            Sign Up
+            {t("signup")}
           </Link>
         </li>
       </ul>

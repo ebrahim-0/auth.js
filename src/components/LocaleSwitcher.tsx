@@ -7,7 +7,6 @@ export default function LocaleSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
-
   const locale = useLocale();
 
   return (

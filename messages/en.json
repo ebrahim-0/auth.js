@@ -16,6 +16,12 @@
     "have_account": "Already have an account? Sign in",
     "btn": "Sign up"
   },
+  "navbar": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "signin": "Sign in",
+    "signup": "Sign up"
+  },
   "home": {
     "login_as": "Signed in as:",
     "sign_out": "Sign out"
