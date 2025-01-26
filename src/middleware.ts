@@ -46,6 +46,7 @@ const authMiddleware = auth(async (req) => {
 });
 
 const middleware = (req: NextRequest) => {
+  console.log("🚀 ~ middleware ~ authCookiesName:", authCookiesName);
   const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
   const isAuth = req.cookies.get(authCookiesName)?.value;
   const isHybridPage = testPathnameRegex(hybridRoutes, req.nextUrl.pathname);
