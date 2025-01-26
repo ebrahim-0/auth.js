@@ -14,6 +14,11 @@ const publicRoutes = ["/sign-in", "/sign-up"];
 
 const hybridRoutes = ["/dashboard"];
 
+const authCookiesName =
+  process.env.NODE_ENV === "development"
+    ? "authjs.session-token"
+    : "__Secure-next-auth.session-token";
+
 const testPathnameRegex = (pages: string[], pathName: string): boolean => {
   const pathsWithParams = pages.map((p) => p.replace(/\[.*?\]/g, "[^/]+"));
 
@@ -25,8 +30,8 @@ const testPathnameRegex = (pages: string[], pathName: string): boolean => {
   ).test(pathName);
 };
 
-const authMiddleware = auth((req) => {
-  const isAuth = req.cookies.get("authjs.session-token")?.value;
+const authMiddleware = auth(async (req) => {
+  const isAuth = req.cookies.get(authCookiesName)?.value;
   const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
 
   if (!isAuth && !isPublicPage) {
@@ -42,7 +47,7 @@ const authMiddleware = auth((req) => {
 
 const middleware = (req: NextRequest) => {
   const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
-  const isAuth = req.cookies.get("authjs.session-token")?.value;
+  const isAuth = req.cookies.get(authCookiesName)?.value;
   const isHybridPage = testPathnameRegex(hybridRoutes, req.nextUrl.pathname);
 
   if (isHybridPage) {

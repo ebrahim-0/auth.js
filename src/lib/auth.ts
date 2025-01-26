@@ -61,6 +61,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   callbacks: {
+    authorized: async ({ auth }) => {
+      // Logged in users are authenticated, otherwise redirect to login page
+      return !!auth;
+    },
+
     session: async ({ session, user }) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...userWithoutPassword } = user as {
