@@ -20,6 +20,7 @@ const executeAction = async <T>({
       message: successMessage,
     };
   } catch (error: any) {
+    console.log("🚀 ~ error:", error);
     if (isRedirectError(error)) {
       throw error;
     }

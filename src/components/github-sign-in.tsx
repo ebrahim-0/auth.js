@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Github } from "@/components/ui/github";
 import { signIn } from "@/lib/auth";
+import { getTranslations } from "next-intl/server";
 
-const GithubSignIn = () => {
+const GithubSignIn = async () => {
+  const t = await getTranslations({ namespace: "signin" });
+
   return (
     <form
       action={async () => {
@@ -12,7 +15,7 @@ const GithubSignIn = () => {
     >
       <Button className="w-full" variant="outline">
         <Github />
-        Continue with GitHub
+        {t("login_with_github")}
       </Button>
     </form>
   );

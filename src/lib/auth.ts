@@ -9,18 +9,23 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { schema } from "./schema";
 import { isMatch } from "./action";
-
-class InvalidLoginError extends CredentialsSignin {
-  message = "Invalid Credentials";
-}
+import { getTranslations } from "next-intl/server";
 
 const adapter = PrismaAdapter(db);
+
+export class InvalidError extends CredentialsSignin {
+  constructor(message: string) {
+    super(message);
+    this.message = message;
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter,
   pages: {
     signIn: "/sign-in",
   },
+
   providers: [
     GitHub,
     Google,
@@ -31,6 +36,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
 
       authorize: async (credentials) => {
+        const t = await getTranslations({ namespace: "auth" });
+
         const validate = schema.parse(credentials);
 
         const existingUser = await db.user.findFirst({
@@ -45,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
 
         if (!existingUser || !mathPass) {
-          throw new InvalidLoginError();
+          throw new InvalidError(t("invalid_credentials"));
         }
 
         return existingUser;
@@ -80,7 +87,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const sessionToken = uuid();
 
         if (!params.token.sub) {
-          throw new Error("No user ID found in token");
+          const t = await getTranslations({ namespace: "auth" });
+
+          throw new InvalidError(t("no_user"));
         }
 
         const createdSession = await adapter?.createSession?.({
@@ -90,7 +99,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
 
         if (!createdSession) {
-          throw new Error("Failed to create session");
+          throw new InvalidError("Failed to create session");
         }
 
         return sessionToken;

@@ -1,6 +1,9 @@
+import { getTranslations } from "next-intl/server";
 import db from "./db";
 import { executeAction } from "./executeAction";
 import { schema } from "./schema";
+import { compare, genSaltSync, hashSync } from "bcrypt-ts";
+import { InvalidError } from "./auth";
 
 export const signUp = async (formData: FormData) => {
   return executeAction({
@@ -17,7 +20,9 @@ export const signUp = async (formData: FormData) => {
       });
 
       if (existingUser?.id) {
-        throw new Error("User already exists");
+        const t = await getTranslations({ namespace: "auth" });
+
+        throw new InvalidError(t("user_exists"));
         return;
       }
 
@@ -34,31 +39,10 @@ export const signUp = async (formData: FormData) => {
 };
 
 export const hashPassword = async (password: string) => {
-  const crypto = await import("crypto");
-
-  return new Promise<string>((resolve, reject) => {
-    crypto.pbkdf2(password, "salt", 12, 64, "sha512", (err, derivedKey) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      resolve(derivedKey.toString("hex"));
-    });
-  });
+  const salt = genSaltSync(10);
+  return hashSync(password, salt);
 };
 
 export const isMatch = async (password: string, hash: string) => {
-  const crypto = await import("crypto");
-
-  return new Promise<boolean>((resolve, reject) => {
-    crypto.pbkdf2(password, "salt", 12, 64, "sha512", (err, derivedKey) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      resolve(derivedKey.toString("hex") === hash);
-    });
-  });
+  return await compare(password, hash);
 };

@@ -1,0 +1,28 @@
+{
+  "signin": {
+    "title": "Sign in",
+    "login_with_email": "Or continue with email",
+    "login_with_google": "continue with Google",
+    "login_with_github": "continue with GitHub",
+    "no_account": "Don't have an account? Sign up",
+    "email": "Email",
+    "password": "Password",
+    "btn_signin": "Sign in",
+    "btn_signup": "Sign Up"
+  },
+  "signup": {
+    "title": "Create Account",
+    "login_with_email": "Or continue with email",
+    "have_account": "Already have an account? Sign in",
+    "btn": "Sign up"
+  },
+  "home": {
+    "login_as": "Signed in as:",
+    "sign_out": "Sign out"
+  },
+  "auth": {
+    "invalid_credentials": "Invalid credentials",
+    "no_user": "No user ID found in token",
+    "user_exists": "User already exists"
+  }
+}

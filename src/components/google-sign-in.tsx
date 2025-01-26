@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/lib/auth";
 import { Google } from "@/components/ui/google";
+import { getTranslations } from "next-intl/server";
 
-const GoogleSignIn = () => {
+const GoogleSignIn = async () => {
+  const t = await getTranslations({ namespace: "signin" });
+
   return (
     <form
       action={async () => {
@@ -12,7 +15,7 @@ const GoogleSignIn = () => {
     >
       <Button className="w-full" variant="outline">
         <Google />
-        Continue with Google
+        {t("login_with_google")}
       </Button>
     </form>
   );
