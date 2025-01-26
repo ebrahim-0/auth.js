@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import db from "./db";
 import { executeAction } from "./executeAction";
 import { schema } from "./schema";
@@ -26,15 +26,23 @@ export const signUp = async (formData: FormData) => {
         return;
       }
 
+      const lang = await getLocale();
+
+      const name = lang === "en" ? "User" : "مستخدم";
+
       await db.user.create({
         data: {
           email: validate.email.toLocaleLowerCase(),
           password: await hashPassword(validate.password),
-          name: "User",
+          name,
         },
       });
     },
-    successMessage: "Signed up successfully",
+    successMessage: {
+      namespace: "auth",
+      key: "sign_up_success",
+      fallback: "User has been created successfully",
+    },
   });
 };
 

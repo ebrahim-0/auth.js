@@ -1,7 +1,7 @@
-import { routing } from "@/i18n/routing";
+import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
-export default function RootPage() {
-  const lang = routing.localeDetection;
+export default async function RootPage() {
+  const lang = await getLocale();
   redirect(`/${lang}`);
 }

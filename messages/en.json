@@ -23,6 +23,7 @@
   "auth": {
     "invalid_credentials": "Invalid credentials",
     "no_user": "No user ID found in token",
-    "user_exists": "User already exists"
+    "user_exists": "User already exists",
+    "sign_up_success": "Sign up successful"
   }
 }

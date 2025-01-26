@@ -8,7 +8,7 @@ import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import LocaleSwitcher from "@/components/LocaleSwitcher";
+import NavBar from "@/components/NavBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,8 +44,8 @@ const Layout = async ({ children, params: { locale } }: LayoutProps) => {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <main className="flex items-center justify-center min-h-screen bg-gray-100">
-            <LocaleSwitcher />
+          <NavBar />
+          <main className="flex items-center justify-center min-h-[calc(100vh-65px)] bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
               {children}
               <Toaster />
