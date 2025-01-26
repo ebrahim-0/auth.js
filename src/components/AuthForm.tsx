@@ -24,7 +24,6 @@ const AuthForm = ({
   type: "sign-in" | "sign-up";
 }) => {
   const [state, formAction, isPending] = useActionState(actionFn, initialState);
-  console.log("🚀 ~ state:", state);
 
   const t = useTranslations("signin");
 
