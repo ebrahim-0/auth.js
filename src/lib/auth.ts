@@ -26,33 +26,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/sign-in",
   },
 
-  cookies: {
-    sessionToken: {
-      name: "authjs.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-    },
-    callbackUrl: {
-      name: "authjs.callback-url",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-    csrfToken: {
-      name: "authjs.csrf-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
+  // cookies: {
+  //   sessionToken: {
+  //     name: "authjs.session-token",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       secure: process.env.NODE_ENV === "production",
+  //       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  //     },
+  //   },
+  //   callbackUrl: {
+  //     name: "authjs.callback-url",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       secure: process.env.NODE_ENV === "production",
+  //     },
+  //   },
+  //   csrfToken: {
+  //     name: "authjs.csrf-token",
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       secure: process.env.NODE_ENV === "production",
+  //     },
+  //   },
+  // },
   providers: [
     GitHub,
     Google,
