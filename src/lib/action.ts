@@ -2,8 +2,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import db from "./db";
 import { executeAction } from "./executeAction";
 import { schema } from "./schema";
-import { compare, genSaltSync, hashSync } from "bcrypt-ts";
 import { InvalidError } from "./auth";
+import { hashPassword } from "./utils";
 
 export const signUp = async (formData: FormData) => {
   return executeAction({
@@ -44,13 +44,4 @@ export const signUp = async (formData: FormData) => {
       fallback: "User has been created successfully",
     },
   });
-};
-
-export const hashPassword = async (password: string) => {
-  const salt = genSaltSync(10);
-  return hashSync(password, salt);
-};
-
-export const isMatch = async (password: string, hash: string) => {
-  return await compare(password, hash);
 };

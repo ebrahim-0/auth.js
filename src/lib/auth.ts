@@ -8,7 +8,7 @@ import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { schema } from "./schema";
-import { isMatch } from "./action";
+import { isMatch } from "./utils";
 import { getTranslations } from "next-intl/server";
 
 const adapter = PrismaAdapter(db);
@@ -25,34 +25,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/sign-in",
   },
-
-  // cookies: {
-  //   sessionToken: {
-  //     name: "authjs.session-token",
-  //     options: {
-  //       httpOnly: true,
-  //       sameSite: "lax",
-  //       secure: process.env.NODE_ENV === "production",
-  //       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-  //     },
-  //   },
-  //   callbackUrl: {
-  //     name: "authjs.callback-url",
-  //     options: {
-  //       httpOnly: true,
-  //       sameSite: "lax",
-  //       secure: process.env.NODE_ENV === "production",
-  //     },
-  //   },
-  //   csrfToken: {
-  //     name: "authjs.csrf-token",
-  //     options: {
-  //       httpOnly: true,
-  //       sameSite: "lax",
-  //       secure: process.env.NODE_ENV === "production",
-  //     },
-  //   },
-  // },
   providers: [
     GitHub,
     Google,
@@ -88,11 +60,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   callbacks: {
-    authorized: async ({ auth }) => {
-      // Logged in users are authenticated, otherwise redirect to login page
-      return !!auth;
-    },
-
     session: async ({ session, user }) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...userWithoutPassword } = user as {
