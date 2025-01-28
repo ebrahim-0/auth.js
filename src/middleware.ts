@@ -1,84 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { auth } from "@/lib/auth";
-import createMiddleware from "next-intl/middleware";
-import { NextRequest, NextResponse } from "next/server";
-
+import { auth } from "./lib/auth";
 import { routing } from "./i18n/routing";
-import { authCookiesName } from "./lib/utils";
-
-const locales = routing.locales;
+import createMiddleware from "next-intl/middleware";
 
 const intlMiddleware = createMiddleware(routing);
 
-const publicRoutes = ["/sign-in", "/sign-up"];
-
-const hybridRoutes = ["/dashboard"];
-
-const testPathnameRegex = (pages: string[], pathName: string): boolean => {
-  const pathsWithParams = pages.map((p) => p.replace(/\[.*?\]/g, "[^/]+"));
-
-  return RegExp(
-    `^(/(${locales.join("|")}))?(${pathsWithParams
-      .flatMap((p) => (p === "/" ? ["", "/"] : p))
-      .join("|")})/?$`,
-    "i"
-  ).test(pathName);
-};
-
-const authMiddleware = auth(async (req) => {
-  const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
-  const token = req.cookies.get(authCookiesName)?.value;
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/auth`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const { userId: isAuth } = await res.json();
-
-  if (!isAuth && !isPublicPage) {
-    return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
-  }
-
-  if (isAuth && isPublicPage) {
-    return NextResponse.redirect(new URL("/", req.nextUrl));
-  }
-
+export const middleware = auth(async (req) => {
   return intlMiddleware(req);
 });
 
-const middleware = async (req: NextRequest) => {
-  const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
-  const isHybridPage = testPathnameRegex(hybridRoutes, req.nextUrl.pathname);
-
-  const token = req.cookies.get(authCookiesName)?.value;
-
-  const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/auth`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const { userId: isAuth } = await res.json();
-
-  if (isHybridPage) {
-    return intlMiddleware(req);
-  }
-
-  if (isAuth) {
-    return (authMiddleware as any)(req);
-  }
-
-  if (isPublicPage) {
-    return intlMiddleware(req);
-  } else {
-    return (authMiddleware as any)(req);
-  }
-};
-
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  // Match only internationalized pathnames
+  matcher: ["/", "/(ar|en)/:path*", "/((?!api|_next|_vercel|.*\\..*).*)"],
 };
-
-export default middleware;

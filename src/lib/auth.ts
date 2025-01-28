@@ -8,8 +8,10 @@ import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import { schema } from "./schema";
-import { isMatch } from "./utils";
+import { authCookiesName, isMatch } from "./utils";
 import { getTranslations } from "next-intl/server";
+import { publicRoutes, testPathnameRegex } from "./checkRoute";
+import { NextResponse } from "next/server";
 
 const adapter = PrismaAdapter(db);
 
@@ -72,6 +74,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   callbacks: {
+    async authorized({ request: { cookies, nextUrl } }) {
+      const token = cookies.get(authCookiesName)?.value;
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/auth`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const { userId: isAuth } = await res.json();
+
+      const isPublicPage = testPathnameRegex(publicRoutes, nextUrl.pathname);
+      const lang = nextUrl.pathname.split("/")[1];
+
+      if (isAuth && isPublicPage) {
+        return NextResponse.redirect(new URL(`/${lang}`, nextUrl));
+      }
+
+      if (!isAuth && !isPublicPage) {
+        return NextResponse.redirect(new URL(`/${lang}/sign-in`, nextUrl));
+      }
+
+      return true;
+    },
+
     session: async ({ session, user }) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...userWithoutPassword } = user as {
