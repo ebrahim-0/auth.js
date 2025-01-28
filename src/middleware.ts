@@ -5,6 +5,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 
 import { routing } from "./i18n/routing";
+import { authCookiesName } from "./lib/utils";
 
 const locales = routing.locales;
 
@@ -13,13 +14,6 @@ const intlMiddleware = createMiddleware(routing);
 const publicRoutes = ["/sign-in", "/sign-up"];
 
 const hybridRoutes = ["/dashboard"];
-
-const authCookiesName =
-  process.env.NODE_ENV === "development"
-    ? "authjs.session-token"
-    : "__Secure-authjs.session-token";
-
-// const authCookiesName = "authjs.session-token";
 
 const testPathnameRegex = (pages: string[], pathName: string): boolean => {
   const pathsWithParams = pages.map((p) => p.replace(/\[.*?\]/g, "[^/]+"));
@@ -33,8 +27,15 @@ const testPathnameRegex = (pages: string[], pathName: string): boolean => {
 };
 
 const authMiddleware = auth(async (req) => {
-  const isAuth = req.cookies.get(authCookiesName)?.value;
   const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
+  const token = req.cookies.get(authCookiesName)?.value;
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/auth`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const { userId: isAuth } = await res.json();
 
   if (!isAuth && !isPublicPage) {
     return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
@@ -49,8 +50,17 @@ const authMiddleware = auth(async (req) => {
 
 const middleware = async (req: NextRequest) => {
   const isPublicPage = testPathnameRegex(publicRoutes, req.nextUrl.pathname);
-  const isAuth = req.cookies.get(authCookiesName)?.value;
   const isHybridPage = testPathnameRegex(hybridRoutes, req.nextUrl.pathname);
+
+  const token = req.cookies.get(authCookiesName)?.value;
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/auth`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const { userId: isAuth } = await res.json();
 
   if (isHybridPage) {
     return intlMiddleware(req);

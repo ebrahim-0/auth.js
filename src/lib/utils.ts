@@ -2,7 +2,7 @@ import { compare, genSaltSync, hashSync } from "bcrypt-ts";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-const cn = (...inputs: ClassValue[]) => {
+export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
@@ -15,4 +15,7 @@ export const isMatch = async (password: string, hash: string) => {
   return await compare(password, hash);
 };
 
-export { cn };
+export const authCookiesName =
+  process.env.NODE_ENV === "development"
+    ? "authjs.session-token"
+    : "__Secure-authjs.session-token";

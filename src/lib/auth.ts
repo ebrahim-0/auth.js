@@ -45,14 +45,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
 
+        if (!existingUser) {
+          throw new InvalidError(t("invalid_credentials"));
+        }
+
         const mathPass = await isMatch(
           validate.password,
           existingUser?.password || ""
         );
 
-        if (!existingUser || !mathPass) {
+        if (!mathPass) {
           throw new InvalidError(t("invalid_credentials"));
         }
+
+        // to make only one session per user
+
+        await db.session.deleteMany({
+          where: {
+            userId: existingUser.id,
+          },
+        });
 
         return existingUser;
       },
