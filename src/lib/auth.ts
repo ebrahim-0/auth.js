@@ -86,14 +86,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const { userId: isAuth } = await res.json();
 
       const isPublicPage = testPathnameRegex(publicRoutes, nextUrl.pathname);
-      const lang = nextUrl.pathname.split("/")[1];
 
       if (isAuth && isPublicPage) {
-        return NextResponse.redirect(new URL(`/${lang}`, nextUrl));
+        return NextResponse.redirect(new URL("/", nextUrl));
       }
 
       if (!isAuth && !isPublicPage) {
-        return NextResponse.redirect(new URL(`/${lang}/sign-in`, nextUrl));
+        return NextResponse.redirect(new URL("/sign-in", nextUrl));
       }
 
       return true;
